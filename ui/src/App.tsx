@@ -1,19 +1,28 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Onboarding from './components/Onboarding'
-import './App.css'
+import NavigationBar from './components/NavigationBar'
+import Home from './components/Home'
 
-const api = axios.create({ baseURL: '' })
+type UserContext = {
+  name: string
+  current_role: string
+  desired_role: string
+  purpose: string
+}
 
 type AppState = 'loading' | 'onboarding' | 'ready'
 
 function App() {
   const [appState, setAppState] = useState<AppState>('loading')
-  const [message, setMessage] = useState<string>('')
+  const [userContext, setUserContext] = useState<UserContext | null>(null)
 
   useEffect(() => {
-    api.get('/api/user-context')
-      .then(() => setAppState('ready'))
+    axios.get('/api/user-context')
+      .then(res => {
+        setUserContext(res.data)
+        setAppState('ready')
+      })
       .catch(err => {
         if (err.response?.status === 404) {
           setAppState('onboarding')
@@ -23,27 +32,21 @@ function App() {
       })
   }, [])
 
-  useEffect(() => {
-    if (appState !== 'ready') return
-    api.get('/api')
-      .then(res => setMessage(res.data))
-      .catch(() => setMessage('Could not connect to server'))
-  }, [appState])
-
   if (appState === 'loading') return null
 
   if (appState === 'onboarding') {
-    return <Onboarding onComplete={() => setAppState('ready')} />
+    return <Onboarding onComplete={() => {
+      axios.get('/api/user-context').then(res => {
+        setUserContext(res.data)
+        setAppState('ready')
+      })
+    }} />
   }
 
   return (
     <>
-      <section id="center">
-        <div>
-          <h1>System Design Prep</h1>
-          {message && <p>{message}</p>}
-        </div>
-      </section>
+      <NavigationBar userContext={userContext!} />
+      <Home />
     </>
   )
 }
