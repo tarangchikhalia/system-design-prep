@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
-import './Home.css'
 
 type UserContext = {
   name: string
@@ -26,6 +25,12 @@ type ChallengesResponse = {
 }
 
 const DIFFICULTY_OPTIONS = ['', 'easy', 'medium', 'hard'] as const
+
+const DIFFICULTY_BADGE: Record<string, string> = {
+  easy: 'bg-black text-white',
+  medium: 'bg-[#444] text-white',
+  hard: 'bg-[#c00] text-white',
+}
 
 export default function Home() {
   const [userContext, setUserContext] = useState<UserContext | null>(null)
@@ -78,13 +83,13 @@ export default function Home() {
   if (!userContext) return null
 
   return (
-    <main className="home">
-      <h1 className="home-heading">Welcome, {userContext.name}</h1>
-      <p className="home-subheading">Browse challenges below to start practising.</p>
+    <main className="mt-[52px] mx-auto px-6 py-12 max-w-[860px]">
+      <h1 className="text-[2rem] font-bold mb-2 text-black m-0">Welcome, {userContext.name}</h1>
+      <p className="text-base text-[#333] mb-8 m-0">Browse challenges below to start practising.</p>
 
-      <div className="filter-bar">
+      <div className="flex items-center flex-wrap gap-2.5 pb-5 mb-6 border-b border-black">
         <select
-          className="filter-select"
+          className="font-[inherit] text-[0.9rem] py-[7px] px-[10px] border border-black rounded bg-white text-black outline-none focus:border-2"
           value={filterDifficulty}
           onChange={e => handleDifficultyChange(e.target.value)}
         >
@@ -93,41 +98,53 @@ export default function Home() {
           ))}
         </select>
 
-        <div className="filter-topic-group">
+        <div className="flex">
           <input
-            className="filter-input"
+            className="font-[inherit] text-[0.9rem] py-[7px] px-[10px] border border-black rounded-l bg-white text-black outline-none focus:border-2 border-r-0"
             type="text"
             placeholder="Filter by topic…"
             value={topicInput}
             onChange={e => setTopicInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleTopicSearch()}
           />
-          <button className="filter-btn" onClick={handleTopicSearch}>Search</button>
+          <button
+            className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border border-black py-[7px] px-[14px] rounded-r cursor-pointer hover:bg-[#222]"
+            onClick={handleTopicSearch}
+          >
+            Search
+          </button>
         </div>
 
         {(filterDifficulty || filterTopic) && (
-          <button className="filter-clear-btn" onClick={handleClear}>Clear</button>
+          <button
+            className="font-[inherit] text-[0.85rem] bg-white text-black border border-black py-[7px] px-3 rounded cursor-pointer hover:bg-[#f5f5f5]"
+            onClick={handleClear}
+          >
+            Clear
+          </button>
         )}
 
-        <span className="filter-count">{total} challenge{total !== 1 ? 's' : ''}</span>
+        <span className="text-[0.85rem] text-[#666] ml-auto">{total} challenge{total !== 1 ? 's' : ''}</span>
       </div>
 
       {loading ? (
-        <p className="challenges-loading">Loading…</p>
+        <p className="text-[#666] text-[0.95rem] m-0">Loading…</p>
       ) : challenges.length === 0 ? (
-        <p className="challenges-empty">No challenges match your filters.</p>
+        <p className="text-[#666] text-[0.95rem] m-0">No challenges match your filters.</p>
       ) : (
-        <ul className="challenge-list">
+        <ul className="list-none m-0 p-0 flex flex-col gap-3">
           {challenges.map(c => (
-            <li key={c.id} className="challenge-card">
-              <div className="challenge-card-header">
-                <Link className="challenge-card-title" to={`/challenge/${c.id}`}>{c.challenge_name}</Link>
-                <span className={`difficulty-badge difficulty-${c.difficulty}`}>{c.difficulty}</span>
+            <li key={c.id} className="border border-black rounded p-4 px-5 cursor-default transition-colors duration-100 hover:bg-[#f9f9f9]">
+              <div className="flex items-center gap-2.5 mb-2">
+                <Link className="text-[1.05rem] font-bold text-black no-underline hover:underline" to={`/challenge/${c.id}`}>{c.challenge_name}</Link>
+                <span className={`text-[0.72rem] font-bold uppercase tracking-widest py-0.5 px-2 rounded ${DIFFICULTY_BADGE[c.difficulty] ?? 'bg-black text-white'}`}>
+                  {c.difficulty}
+                </span>
               </div>
-              <p className="challenge-card-desc">{c.description}</p>
-              <div className="topic-tags">
+              <p className="text-[0.9rem] text-[#333] m-0 mb-3 line-clamp-2">{c.description}</p>
+              <div className="flex flex-wrap gap-1.5">
                 {c.topics.map(t => (
-                  <span key={t} className="topic-tag">{t}</span>
+                  <span key={t} className="text-[0.78rem] border border-black rounded px-2 py-0.5 text-black">{t}</span>
                 ))}
               </div>
             </li>
@@ -136,17 +153,17 @@ export default function Home() {
       )}
 
       {totalPages > 1 && (
-        <div className="pagination">
+        <div className="flex items-center gap-[14px] mt-7">
           <button
-            className="pagination-btn"
+            className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border-none py-2 px-5 rounded cursor-pointer tracking-wide disabled:opacity-35 disabled:cursor-not-allowed enabled:hover:bg-[#222]"
             onClick={() => setPage(p => p - 1)}
             disabled={page <= 1}
           >
             ← Prev
           </button>
-          <span className="pagination-label">Page {page} of {totalPages}</span>
+          <span className="text-[0.9rem] text-[#333]">Page {page} of {totalPages}</span>
           <button
-            className="pagination-btn"
+            className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border-none py-2 px-5 rounded cursor-pointer tracking-wide disabled:opacity-35 disabled:cursor-not-allowed enabled:hover:bg-[#222]"
             onClick={() => setPage(p => p + 1)}
             disabled={page >= totalPages}
           >

@@ -1,8 +1,7 @@
-import './DiagramPanel.css'
-
 export default function DiagramPanel() {
   return (
-    <div className="diagram-panel">
+    <div className="w-full h-full">
+      <h1>Diagram</h1>
     </div>
   )
 }
