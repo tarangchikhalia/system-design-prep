@@ -3,7 +3,11 @@ import { Excalidraw, serializeAsJSON } from '@excalidraw/excalidraw'
 import '@excalidraw/excalidraw/index.css'
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types'
 
-export default function DiagramPanel() {
+type Props = {
+  onReady: (getJSON: () => string) => void
+}
+
+export default function DiagramPanel({ onReady }: Props) {
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null)
 
   function handleGenerate() {
@@ -25,7 +29,17 @@ export default function DiagramPanel() {
         </button>
       </div>
       <div className="flex-1 relative min-h-0">
-        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
+        <Excalidraw
+          excalidrawAPI={(api) => {
+            setExcalidrawAPI(api)
+            onReady(() => serializeAsJSON(
+              api.getSceneElements(),
+              api.getAppState(),
+              api.getFiles(),
+              'local'
+            ))
+          }}
+        />
       </div>
     </div>
   )

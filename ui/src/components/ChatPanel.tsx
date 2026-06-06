@@ -4,13 +4,18 @@ type Message = {
   id: string
   role: 'user' | 'assistant'
   content: string
+  hasDiagram?: boolean
 }
 
 function uid() {
   return Math.random().toString(36).slice(2)
 }
 
-export default function ChatPanel() {
+type Props = {
+  getDiagramJSON: () => string | null
+}
+
+export default function ChatPanel({ getDiagramJSON }: Props) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
@@ -25,7 +30,10 @@ export default function ChatPanel() {
     const text = input.trim()
     if (!text || streaming) return
 
-    const userMsg: Message = { id: uid(), role: 'user', content: text }
+    const hasDiagram = text.includes('@diagram')
+    const diagramJSON = hasDiagram ? getDiagramJSON() : null
+
+    const userMsg: Message = { id: uid(), role: 'user', content: text, hasDiagram: hasDiagram && diagramJSON !== null }
     const assistantId = uid()
     const assistantMsg: Message = { id: assistantId, role: 'assistant', content: '' }
 
@@ -39,7 +47,11 @@ export default function ChatPanel() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({
+          message: text,
+          history,
+          ...(diagramJSON ? { diagram: diagramJSON } : {}),
+        }),
       })
 
       if (!res.ok || !res.body) throw new Error('no stream')
@@ -105,6 +117,9 @@ export default function ChatPanel() {
               {msg.content}
               {streaming && msg.id === lastId && msg.role === 'assistant' && (
                 <span className="inline-block w-[2px] h-[1em] bg-black align-middle ml-0.5 animate-pulse" />
+              )}
+              {msg.hasDiagram && (
+                <div className="text-[0.72rem] mt-1 opacity-60">↳ diagram attached</div>
               )}
             </div>
           </div>

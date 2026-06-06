@@ -27,6 +27,7 @@ export default function Challenge() {
   const [started, setStarted] = useState(false)
   const [timeLeft, setTimeLeft] = useState(DEFAULT_MINUTES * 60)
   const containerRef = useRef<HTMLDivElement>(null)
+  const getDiagramJSONRef = useRef<(() => string) | null>(null)
 
   const timeUp = started && timeLeft <= 0
   const panelsEnabled = started && !timeUp
@@ -93,7 +94,7 @@ export default function Challenge() {
           className={`relative overflow-hidden flex items-center justify-center bg-white${!panelsEnabled ? ' after:content-[\'\'] after:absolute after:inset-0 after:bg-[rgba(210,210,210,0.5)] after:pointer-events-none after:z-10' : ''}`}
           style={{ width: `${leftWidth}%` }}
         >
-          <ChatPanel />
+          <ChatPanel getDiagramJSON={() => getDiagramJSONRef.current?.() ?? null} />
         </div>
 
         <div
@@ -105,7 +106,7 @@ export default function Challenge() {
         <div
           className={`relative overflow-hidden flex items-center justify-center bg-white flex-1${!panelsEnabled ? ' after:content-[\'\'] after:absolute after:inset-0 after:bg-[rgba(210,210,210,0.5)] after:pointer-events-none after:z-10' : ''}`}
         >
-          <DiagramPanel />
+          <DiagramPanel onReady={(fn) => { getDiagramJSONRef.current = fn }} />
         </div>
       </div>
     </div>
