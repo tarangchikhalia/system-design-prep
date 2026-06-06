@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import GenerateChallengeDialog from './GenerateChallengeDialog'
 
 type UserContext = {
   name: string
@@ -33,7 +34,9 @@ const DIFFICULTY_BADGE: Record<string, string> = {
 }
 
 export default function Home() {
+  const navigate = useNavigate()
   const [userContext, setUserContext] = useState<UserContext | null>(null)
+  const [showGenerate, setShowGenerate] = useState(false)
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -84,8 +87,23 @@ export default function Home() {
 
   return (
     <main className="mt-[52px] mx-auto px-6 py-12 max-w-[860px]">
-      <h1 className="text-[2rem] font-bold mb-2 text-black m-0">Welcome, {userContext.name}</h1>
+      <div className="flex items-start justify-between mb-2">
+        <h1 className="text-[2rem] font-bold text-black m-0">Welcome, {userContext.name}</h1>
+        <button
+          onClick={() => setShowGenerate(true)}
+          className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border-none py-[7px] px-4 rounded cursor-pointer hover:bg-[#222] flex-shrink-0 mt-1"
+        >
+          + Generate Challenge
+        </button>
+      </div>
       <p className="text-base text-[#333] mb-8 m-0">Browse challenges below to start practising.</p>
+
+      {showGenerate && (
+        <GenerateChallengeDialog
+          onClose={() => setShowGenerate(false)}
+          onCreated={(id) => navigate(`/challenge/${id}`)}
+        />
+      )}
 
       <div className="flex items-center flex-wrap gap-2.5 pb-5 mb-6 border-b border-black">
         <select
