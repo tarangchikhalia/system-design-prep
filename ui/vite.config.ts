@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   optimizeDeps: {
-    include: ['react-simple-code-editor'],
+    include: ['react-simple-code-editor', '@excalidraw/excalidraw'],
   },
   server: {
     proxy: {
