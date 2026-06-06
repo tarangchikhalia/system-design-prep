@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/tarangchikhalia/system-design-prep#readme",
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.1",
     "concurrently": "^10.0.3",
@@ -30,6 +31,10 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "better-sqlite3": "^12.10.0",
     "express": "^5.2.1"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.10.0": true
   }
 }

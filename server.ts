@@ -2,9 +2,14 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import { initDb } from './src/db';
+import challengesRouter from './src/routes/challenges';
 
 const app = express();
 app.use(express.json());
+
+initDb();
+app.use('/api', challengesRouter);
 
 const USER_CONTEXT_PATH = path.join(__dirname, 'user_context.json');
 
