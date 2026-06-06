@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Onboarding from './components/Onboarding'
 import NavigationBar from './components/NavigationBar'
 import Home from './components/Home'
+import Challenge from './components/Challenge'
 
 type UserContext = {
   name: string
@@ -44,10 +46,13 @@ function App() {
   }
 
   return (
-    <>
+    <BrowserRouter>
       <NavigationBar userContext={userContext!} />
-      <Home />
-    </>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/challenge/:id" element={<Challenge />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

@@ -73,6 +73,16 @@ router.post('/challenges', (req: Request, res: Response) => {
   res.status(201).json(parseTopics(created));
 });
 
+router.get('/challenges/:id', (req: Request, res: Response) => {
+  const id = parseInt(String(req.params['id']), 10);
+  const row = db.prepare('SELECT * FROM challenges WHERE id = ?').get(id) as ChallengeRow | undefined;
+  if (!row) {
+    res.status(404).json({ error: 'Challenge not found' });
+    return;
+  }
+  res.json(parseTopics(row));
+});
+
 router.put('/challenges/:id', (req: Request, res: Response) => {
   const id = parseInt(String(req.params['id']), 10);
   const existing = db.prepare('SELECT * FROM challenges WHERE id = ?').get(id) as ChallengeRow | undefined;

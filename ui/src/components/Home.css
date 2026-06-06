@@ -134,6 +134,11 @@
   font-size: 1.05rem;
   font-weight: 700;
   color: #000;
+  text-decoration: none;
+}
+
+.challenge-card-title:hover {
+  text-decoration: underline;
 }
 
 .difficulty-badge {

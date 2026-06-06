@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 import './Home.css'
 
 type UserContext = {
@@ -120,7 +121,7 @@ export default function Home() {
           {challenges.map(c => (
             <li key={c.id} className="challenge-card">
               <div className="challenge-card-header">
-                <span className="challenge-card-title">{c.challenge_name}</span>
+                <Link className="challenge-card-title" to={`/challenge/${c.id}`}>{c.challenge_name}</Link>
                 <span className={`difficulty-badge difficulty-${c.difficulty}`}>{c.difficulty}</span>
               </div>
               <p className="challenge-card-desc">{c.description}</p>
