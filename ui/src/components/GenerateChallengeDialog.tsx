@@ -1,48 +1,49 @@
-import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 type Props = {
-  onClose: () => void
-  onCreated: (id: number) => void
-}
+  onClose: () => void;
+  onCreated: (id: number) => void;
+};
 
 export default function GenerateChallengeDialog({ onClose, onCreated }: Props) {
-  const [prompt, setPrompt] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    textareaRef.current?.focus()
-  }, [])
+    textareaRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === "Escape") onClose();
     }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [onClose])
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
   async function handleGenerate() {
-    const text = prompt.trim()
-    if (!text || loading) return
-    setError('')
-    setLoading(true)
+    const text = prompt.trim();
+    if (!text || loading) return;
+    setError("");
+    setLoading(true);
     try {
-      const res = await axios.post('/api/generate-challenge', { prompt: text })
-      onCreated(res.data.id)
+      const res = await axios.post("/api/generate-challenge", { prompt: text });
+      console.log(res);
+      onCreated(res.data.id);
     } catch {
-      setError('Challenge generation is not available yet.')
+      setError("Challenge generation is not available yet.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleGenerate()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleGenerate();
     }
   }
 
@@ -53,11 +54,15 @@ export default function GenerateChallengeDialog({ onClose, onCreated }: Props) {
     >
       <div
         className="bg-white border border-black rounded p-8 w-[480px] max-w-[90vw] flex flex-col gap-5"
-        onMouseDown={e => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <div>
-          <h2 className="text-[1.4rem] font-bold text-black m-0 mb-1">Generate Challenge</h2>
-          <p className="text-[0.9rem] text-[#333] m-0">Describe the challenge you want to practise.</p>
+          <h2 className="text-[1.4rem] font-bold text-black m-0 mb-1">
+            Generate Challenge
+          </h2>
+          <p className="text-[0.9rem] text-[#333] m-0">
+            Describe the challenge you want to practise.
+          </p>
         </div>
 
         <textarea
@@ -66,10 +71,38 @@ export default function GenerateChallengeDialog({ onClose, onCreated }: Props) {
           rows={4}
           placeholder="e.g. Design a ride sharing app"
           value={prompt}
-          onChange={e => setPrompt(e.target.value)}
+          onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={loading}
         />
+
+        {loading && (
+          <div className="flex items-center gap-3 py-2">
+            <svg
+              className="animate-spin h-5 w-5 text-black shrink-0"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <span className="text-[0.9rem] text-[#555]">
+              AI is generating your challenge, this may take a moment…
+            </span>
+          </div>
+        )}
 
         {error && <p className="text-[0.9rem] text-[#c00] m-0">{error}</p>}
 
@@ -84,12 +117,34 @@ export default function GenerateChallengeDialog({ onClose, onCreated }: Props) {
           <button
             onClick={handleGenerate}
             disabled={loading || !prompt.trim()}
-            className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border-none py-[7px] px-5 rounded cursor-pointer enabled:hover:bg-[#222] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="font-[inherit] text-[0.9rem] font-semibold bg-black text-white border-none py-[7px] px-5 rounded cursor-pointer enabled:hover:bg-[#222] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {loading ? 'Generating…' : 'Generate'}
+            {loading && (
+              <svg
+                className="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            )}
+            {loading ? "Generating…" : "Generate"}
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

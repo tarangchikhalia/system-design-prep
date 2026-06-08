@@ -13,8 +13,8 @@ app.use('/api', challengesRouter);
 
 const USER_CONTEXT_PATH = path.join(__dirname, 'user_context.json');
 
-app.get('/api', (req, res) => {
-  res.send('Hello World!');
+app.get('/api/healthcheck', (req, res) => {
+  res.send('OK');
 });
 
 app.get('/api/user-context', (req, res) => {
