@@ -26,6 +26,7 @@ export default function Challenge() {
   const [leftWidth, setLeftWidth] = useState(50)
   const [started, setStarted] = useState(false)
   const [timeLeft, setTimeLeft] = useState(DEFAULT_MINUTES * 60)
+  const [sessionId, setSessionId] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const getDiagramJSONRef = useRef<(() => string) | null>(null)
 
@@ -41,6 +42,25 @@ export default function Challenge() {
     const timerId = setInterval(() => setTimeLeft(t => t - 1), 1000)
     return () => clearInterval(timerId)
   }, [started, timeLeft])
+
+  useEffect(() => {
+    if (!timeUp || !sessionId) return
+    axios.patch(`/api/sessions/${sessionId}/end`).then(() => setSessionId(null))
+  }, [timeUp, sessionId])
+
+  async function handleStart() {
+    if (!challenge) return
+    const { data } = await axios.post<{ id: number }>('/api/sessions', { challengeId: challenge.id })
+    setSessionId(data.id)
+    setStarted(true)
+  }
+
+  async function handleStop() {
+    if (sessionId) await axios.patch(`/api/sessions/${sessionId}/end`)
+    setSessionId(null)
+    setStarted(false)
+    setTimeLeft(DEFAULT_MINUTES * 60)
+  }
 
   function onDividerMouseDown(e: React.MouseEvent) {
     e.preventDefault()
@@ -74,14 +94,7 @@ export default function Challenge() {
           </span>
           <button
             className={`font-[inherit] text-[0.9rem] font-semibold text-white border-none py-[7px] px-5 rounded cursor-pointer tracking-wide disabled:opacity-40 disabled:cursor-not-allowed ${panelsEnabled ? 'bg-[#c00] hover:bg-[#a00]' : 'bg-black enabled:hover:bg-[#222]'}`}
-            onClick={() => {
-              if (panelsEnabled) {
-                setStarted(false)
-                setTimeLeft(DEFAULT_MINUTES * 60)
-              } else {
-                setStarted(true)
-              }
-            }}
+            onClick={() => { panelsEnabled ? handleStop() : handleStart() }}
             disabled={timeUp}
           >
             {panelsEnabled ? 'Stop' : 'Start'}
@@ -94,7 +107,12 @@ export default function Challenge() {
           className={`relative overflow-hidden flex items-center justify-center bg-white${!panelsEnabled ? ' after:content-[\'\'] after:absolute after:inset-0 after:bg-[rgba(210,210,210,0.5)] after:pointer-events-none after:z-10' : ''}`}
           style={{ width: `${leftWidth}%` }}
         >
-          <ChatPanel getDiagramJSON={() => getDiagramJSONRef.current?.() ?? null} challengeDescription={challenge.description} />
+          <ChatPanel
+            getDiagramJSON={() => getDiagramJSONRef.current?.() ?? null}
+            challengeDescription={challenge.description}
+            sessionId={sessionId ?? undefined}
+            challengeContext={{ description: challenge.description, difficulty: challenge.difficulty, topics: challenge.topics }}
+          />
         </div>
 
         <div
