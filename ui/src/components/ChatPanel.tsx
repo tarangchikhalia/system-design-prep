@@ -13,10 +13,15 @@ function uid() {
 
 type Props = {
   getDiagramJSON: () => string | null
+  challengeDescription?: string
 }
 
-export default function ChatPanel({ getDiagramJSON }: Props) {
-  const [messages, setMessages] = useState<Message[]>([])
+export default function ChatPanel({ getDiagramJSON, challengeDescription }: Props) {
+  const [messages, setMessages] = useState<Message[]>(() =>
+    challengeDescription
+      ? [{ id: uid(), role: 'assistant', content: challengeDescription }]
+      : []
+  )
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -96,12 +101,6 @@ export default function ChatPanel({ getDiagramJSON }: Props) {
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 flex flex-col gap-3">
-        {messages.length === 0 && (
-          <p className="text-[0.85rem] text-[#666] m-0 text-center mt-8">
-            Start the session and ask a question to begin.
-          </p>
-        )}
-
         {messages.map(msg => (
           <div
             key={msg.id}

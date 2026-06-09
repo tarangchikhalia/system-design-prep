@@ -94,7 +94,7 @@ export default function Challenge() {
           className={`relative overflow-hidden flex items-center justify-center bg-white${!panelsEnabled ? ' after:content-[\'\'] after:absolute after:inset-0 after:bg-[rgba(210,210,210,0.5)] after:pointer-events-none after:z-10' : ''}`}
           style={{ width: `${leftWidth}%` }}
         >
-          <ChatPanel getDiagramJSON={() => getDiagramJSONRef.current?.() ?? null} />
+          <ChatPanel getDiagramJSON={() => getDiagramJSONRef.current?.() ?? null} challengeDescription={challenge.description} />
         </div>
 
         <div
