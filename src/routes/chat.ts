@@ -79,7 +79,7 @@ router.post('/chat', async (req: Request, res: Response) => {
       const token = chunk.choices[0]?.delta?.content ?? '';
       if (token) {
         fullResponse += token;
-        res.write(`data: ${token}\n\n`);
+        res.write(`data: ${token.replace(/\n/g, '\\n')}\n\n`);
       }
     }
 

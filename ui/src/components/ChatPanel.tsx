@@ -78,7 +78,7 @@ export default function ChatPanel({ getDiagramJSON, challengeDescription, sessio
         for (const line of raw.split('\n')) {
           const trimmed = line.trim()
           if (!trimmed.startsWith('data:')) continue
-          const token = trimmed.slice(6) // skip 'data: ' (6 chars) to preserve leading spaces in tokens
+          const token = trimmed.slice(6).replace(/\\n/g, '\n') // skip 'data: '; unescape newlines escaped on the server
           if (token === '[DONE]') break
           setMessages(prev =>
             prev.map(m => m.id === assistantId ? { ...m, content: m.content + token } : m)
