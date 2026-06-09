@@ -14,9 +14,11 @@ function uid() {
 type Props = {
   getDiagramJSON: () => string | null
   challengeDescription?: string
+  sessionId?: number
+  challengeContext?: { description: string; difficulty: string; topics: string[] }
 }
 
-export default function ChatPanel({ getDiagramJSON, challengeDescription }: Props) {
+export default function ChatPanel({ getDiagramJSON, challengeDescription, sessionId, challengeContext }: Props) {
   const [messages, setMessages] = useState<Message[]>(() =>
     challengeDescription
       ? [{ id: uid(), role: 'assistant', content: challengeDescription }]
@@ -56,6 +58,8 @@ export default function ChatPanel({ getDiagramJSON, challengeDescription }: Prop
           message: text,
           history,
           ...(diagramJSON ? { diagram: diagramJSON } : {}),
+          ...(sessionId != null ? { sessionId } : {}),
+          ...(challengeContext ? { challengeContext } : {}),
         }),
       })
 
