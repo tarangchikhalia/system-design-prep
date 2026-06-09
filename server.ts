@@ -4,12 +4,14 @@ import fs from 'fs';
 import path from 'path';
 import { initDb } from './src/db';
 import challengesRouter from './src/routes/challenges';
+import chatRouter from './src/routes/chat';
 
 const app = express();
 app.use(express.json());
 
 initDb();
 app.use('/api', challengesRouter);
+app.use('/api', chatRouter);
 
 const USER_CONTEXT_PATH = path.join(__dirname, 'user_context.json');
 
