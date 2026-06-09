@@ -54,6 +54,26 @@ export function initDb(): void {
     )
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      challenge_id INTEGER NOT NULL,
+      started_at   TEXT    NOT NULL,
+      ended_at     TEXT
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id  INTEGER NOT NULL,
+      role        TEXT    NOT NULL,
+      content     TEXT    NOT NULL,
+      has_diagram INTEGER NOT NULL DEFAULT 0,
+      created_at  TEXT    NOT NULL
+    )
+  `);
+
   const count = (db.prepare('SELECT COUNT(*) as count FROM challenges').get() as { count: number }).count;
   if (count === 0) {
     const insert = db.prepare(
