@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type Message = {
   id: string
@@ -111,13 +113,36 @@ export default function ChatPanel({ getDiagramJSON, challengeDescription, sessio
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded px-3 py-2 text-[0.88rem] leading-relaxed whitespace-pre-wrap break-words ${
+              className={`max-w-[80%] rounded px-3 py-2 text-[0.88rem] leading-relaxed break-words ${
                 msg.role === 'user'
-                  ? 'bg-black text-white'
+                  ? 'bg-black text-white whitespace-pre-wrap'
                   : 'border border-black bg-white text-black'
               }`}
             >
-              {msg.content}
+              {msg.role === 'user' ? (
+                msg.content
+              ) : (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-[0.95rem] font-bold mt-3 mb-1">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-[0.88rem] font-bold mt-2 mb-1">{children}</h3>,
+                    ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                    li: ({ children }) => <li>{children}</li>,
+                    code: ({ inline, children }: { inline?: boolean; children?: React.ReactNode }) =>
+                      inline
+                        ? <code className="bg-gray-100 rounded px-1 py-0.5 text-[0.82rem] font-mono">{children}</code>
+                        : <pre className="bg-gray-100 rounded p-2 my-2 overflow-x-auto text-[0.82rem] font-mono whitespace-pre">{children}</pre>,
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    hr: () => <hr className="border-gray-300 my-2" />,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              )}
               {streaming && msg.id === lastId && msg.role === 'assistant' && (
                 <span className="inline-block w-[2px] h-[1em] bg-black align-middle ml-0.5 animate-pulse" />
               )}
